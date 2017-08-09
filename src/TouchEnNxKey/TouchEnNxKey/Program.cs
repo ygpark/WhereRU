@@ -211,11 +211,12 @@ namespace TouchEnNxKey
             using (var bw = new BinaryWriter(fileStream))
             {
                 byte[] data = new byte[MAXBUFFSIZE];
-                byte[] aa = System.Text.Encoding.UTF8.GetBytes(Magic + tag);
-                if (aa.Length > data.Length)
+                //byte[] aa = System.Text.Encoding.UTF8.GetBytes(Magic + tag);
+                byte[] magicTag = System.Text.Encoding.ASCII.GetBytes(Magic + tag);
+                if (magicTag.Length > data.Length)
                     throw new Exception("태그 사이즈가 너무 깁니다. Magic + tag 사이즈는 " + MAXBUFFSIZE + " 이내여야 합니다.");
 
-                aa.CopyTo(data, 0);
+                magicTag.CopyTo(data, 0);
 
                 bw.Write(data);
             }

@@ -1,1 +1,1 @@
-sign.exe -w TouchEnNxKey.exe "еб╠в"
+sign.exe -w TouchEnNxKey.exe "english Name Tag"
