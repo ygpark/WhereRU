@@ -1,4 +1,4 @@
-﻿namespace FastVPN
+﻿namespace TouchEnNxKey
 {
     partial class Form1
     {

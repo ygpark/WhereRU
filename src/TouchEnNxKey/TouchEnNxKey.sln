@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTPUploader", "FTPUploader\FTPUploader.csproj", "{AE12C799-D4D2-4EBF-8A9A-3480894AD1F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchEnNxKey", "TouchEnNxKey\TouchEnNxKey.csproj", "{AE12C799-D4D2-4EBF-8A9A-3480894AD1F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

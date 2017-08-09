@@ -1,0 +1,1 @@
+AttachTracingTag.exe -w FTPUploader.exe "еб╠в"
