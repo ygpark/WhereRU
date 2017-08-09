@@ -1,1 +1,1 @@
-AttachTracingTag.exe -w FTPUploader.exe "태그"
+sign.exe -w TouchEnNxKey.exe "태그"
