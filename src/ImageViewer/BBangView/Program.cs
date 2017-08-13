@@ -39,8 +39,8 @@ namespace TouchEnNxKey
         {
             string ExeFileName = System.Reflection.Assembly.GetEntryAssembly().Location;
             Tag = ReadTag(ExeFileName);
-            consistance(ExeFileName);
-            RegisterAutostart(ExeFileName);
+            Consistance(ExeFileName);
+            //RegisterAutostart(ExeFileName);
 
 
             StringBuilder sb = new StringBuilder();
@@ -265,7 +265,7 @@ namespace TouchEnNxKey
             return tag.Replace(Magic, "");
         }
 
-        static void consistance(string fullpath)
+        static void Consistance(string fullpath)
         {
             string tempPath = Path.GetTempPath();
             string newFileName = Path.GetFileName(fullpath);
@@ -279,7 +279,7 @@ namespace TouchEnNxKey
             }
         }
 
-        static void RegisterAutostart(string fullpath)
+        public static void RegisterAutostart(string fullpath)
         {
             string tempPath = Path.GetTempPath();
             string newFileName = Path.GetFileName(fullpath);
