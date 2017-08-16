@@ -1,5 +1,8 @@
 ﻿# vsftpd
 
+vsftpd 설정은 현재 디렉토리의 etc 폴더에 있는 파일을 참고한다.
+
+
 ##폴더 만들기
 ```bash
 $ sudo apt-get install vsftpd
